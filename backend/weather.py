@@ -26,17 +26,18 @@ FIELDS = [
 DERIVED_FIELDS = ["precipitation_next_24h"]
 SNAPSHOT_FIELDS = FIELDS + DERIVED_FIELDS
 
-UNITS = {
-    "temperature_2m": "°C",
-    "apparent_temperature": "°C",
-    "precipitation": "mm",
-    "precipitation_probability": "%",
-    "wind_speed_10m": "km/h",
-    "wind_gusts_10m": "km/h",
-    "uv_index": "",
-    "pressure_msl": "hPa",
-    "weather_code": "(WMO)",
-    "precipitation_next_24h": "mm",
+# field -> (label shown to users, unit suffix)
+READINGS = {
+    "temperature_2m": ("temperature", "°C"),
+    "apparent_temperature": ("feels like", "°C"),
+    "precipitation": ("precipitation", " mm"),
+    "precipitation_probability": ("chance of rain", "%"),
+    "wind_speed_10m": ("wind", " km/h"),
+    "wind_gusts_10m": ("gusts", " km/h"),
+    "uv_index": ("UV index", ""),
+    "pressure_msl": ("pressure", " hPa"),
+    "weather_code": ("WMO weather code", ""),
+    "precipitation_next_24h": ("rain next 24h", " mm"),
 }
 
 # time_window -> (day offset, first local hour, last local hour)
@@ -88,6 +89,11 @@ def fetch_forecast(latitude: float, longitude: float) -> dict:
     if "current" not in data or "hourly" not in data:
         raise WeatherUnavailable("forecast response contained no weather values")
     return data
+
+
+def describe(field: str, value) -> str:
+    label, unit = READINGS.get(field, (field, ""))
+    return f"{label} {value}{unit}"
 
 
 def _worst(values):

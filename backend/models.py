@@ -98,6 +98,7 @@ class GraphState(TypedDict, total=False):
     sop_ids: list[str]    # ranked by the conflict rule
     situational: bool
     lead: str             # fixed paragraph written by the override node
+    fallback: bool        # composer text failed the grounding check, template used
     error: str | None     # failure kind
     reply: str
     path: str
