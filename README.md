@@ -8,8 +8,8 @@ A chat bot that answers outdoor-safety questions ("Is it safe to cycle to work i
 
 | Deliverable | Link |
 |---|---|
-| GitHub repo | _add link_ |
-| Live app | _add link_ |
+| GitHub repo | https://github.com/Abhishek-k03/weather-advisory-bot |
+| Live app | https://weather-advisory-ui.onrender.com (the API is at https://weather-advisory-api.onrender.com) |
 | Screen recording | _add link_ |
 
 **Contents:** [Quick start](#quick-start) · [Project structure](#project-structure) · [How it works](#how-it-works) · [SOPs](#sops) · [Session memory](#session-memory) · [Failure handling](#failure-handling) · [Evals](#evals) · [Known limitations](#known-limitations) · [Deploy](#deploy-render)
@@ -269,6 +269,8 @@ Deterministic cases swap only the forecast HTTP call for a crafted payload. Geoc
 - **Rate limits:** Groq's free tier can slow the eval run. The client retries up to 3 times.
 
 ## Deploy (Render)
+
+The live app runs on Render: a web service for the API and one for the Streamlit UI. The free plan sleeps when idle, so the first request after a pause can take about a minute. To deploy your own copy:
 
 1. Push the repo to GitHub.
 2. On Render choose **New → Blueprint** and pick the repo. [render.yaml](render.yaml) defines two free web services: the API and the Streamlit UI.
