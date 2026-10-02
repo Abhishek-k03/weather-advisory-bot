@@ -18,7 +18,8 @@ SOP_ID = re.compile(r"SOP-[A-Z]+-\d+", re.IGNORECASE)
 
 SYSTEM = """You write the reply of a weather-safety assistant for a business that must stand behind every word.
 Hard rules:
-- Use ONLY the advice in the SOPs given. Add no tips, warnings or reassurance that are not in them.
+- Use ONLY the advice in the SOPs given. Add no advice, tip, precaution, interpretation or reassurance
+  of your own: e.g. never mention sunscreen, hydration, clothing or timing unless the SOP text itself does.
 - Cover the SOPs in the order given (most important first) and name each one by its SOP ID.
 - Any number you mention must be copied exactly from the live readings or the SOP text. Never estimate or recall weather.
 - Do not number or count things, and do not use markdown headings, bullets or tables.
