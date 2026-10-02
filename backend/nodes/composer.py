@@ -11,7 +11,7 @@ import re
 from backend.llm import get_llm
 from backend.loader import get_sops
 from backend.models import SEVERITY_RANK, SOP
-from backend.weather import describe
+from backend.weather import READINGS, describe
 
 NUMBER = re.compile(r"\d+(?:\.\d+)?")
 SOP_ID = re.compile(r"SOP-[A-Z]+-\d+", re.IGNORECASE)
@@ -32,7 +32,8 @@ def allowed_numbers(values: dict, sops: list[SOP], extra_text: str) -> set[float
     for v in values.values():
         if isinstance(v, (int, float)):
             allowed |= {float(v), float(round(v)), round(float(v), 1)}
-    text = " ".join([extra_text] + [f"{s.id} {s.cite_as} {s.advice}" for s in sops])
+    labels = [label for label, _ in READINGS.values()]  # e.g. the 24 in "rain next 24h"
+    text = " ".join([extra_text, *labels] + [f"{s.id} {s.cite_as} {s.advice}" for s in sops])
     allowed |= {float(n) for n in NUMBER.findall(text)}
     return allowed
 
