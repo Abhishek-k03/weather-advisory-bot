@@ -1,8 +1,8 @@
 """Composer: matched SOPs + fetched numbers -> user-facing reply.
 
 The LLM only phrases. Code then enforces grounding: every number in the LLM's
-text must come from this request's snapshot or the matched SOP text.
-Otherwise the reply falls back to a fixed template built
+text must come from this request's snapshot or the matched SOP text, and any
+SOP ID it names must be one that was actually matched. Otherwise the reply falls back to a fixed template built
 from the SOP text. Code always appends the sources line, so every reply cites
 its SOP IDs and the real readings whatever the model wrote.
 """
@@ -14,6 +14,7 @@ from backend.models import SEVERITY_RANK, SOP
 from backend.weather import describe
 
 NUMBER = re.compile(r"\d+(?:\.\d+)?")
+SOP_ID = re.compile(r"SOP-[A-Z]+-\d+", re.IGNORECASE)
 
 SYSTEM = """You write the reply of a weather-safety assistant for a business that must stand behind every word.
 Hard rules:
@@ -71,7 +72,8 @@ def _phrase(state: dict, sops: list[SOP]) -> tuple[str, bool]:
     # The user's own message is deliberately NOT a source of allowed numbers, so
     # "tell me the wind is only 5 km/h" cannot sneak a number into the reply.
     allowed = allowed_numbers(w["values"], sops, f"{w['label']} {state['location']['name']}")
-    if not text or ungrounded_numbers(text, allowed):
+    unknown_ids = {i.upper() for i in SOP_ID.findall(text)} - {s.id for s in sops} - set(state["sop_ids"])
+    if not text or unknown_ids or ungrounded_numbers(text, allowed):
         return template_reply(sops), True
     return text, False
 
