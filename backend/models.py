@@ -54,6 +54,11 @@ class SOP(BaseModel):
             raise ValueError(f"unknown weather field(s) {unknown}; available: {SNAPSHOT_FIELDS}")
         return v
 
+    @property
+    def advice_text(self) -> str:
+        """The advice on a single line (the YAML block is wrapped over several)."""
+        return " ".join(self.advice.split())
+
     def conditions_hold(self, values: dict) -> bool:
         return all(cond.holds(values.get(field)) for field, cond in self.conditions.items())
 
@@ -99,7 +104,6 @@ class GraphState(TypedDict, total=False):
     sop_ids: list[str]    # ranked by the conflict rule
     situational: bool
     lead: str             # fixed paragraph written by the override node
-    fallback: bool        # composer text failed the grounding check, template used
     error: str | None     # failure kind
     reply: str
     path: str
