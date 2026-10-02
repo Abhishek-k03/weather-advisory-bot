@@ -35,7 +35,7 @@ The response holds:
 
 **Evals:** run `pytest -v -rA` (needs `GROQ_API_KEY` and internet access). Results are in [evals/RESULTS.md](evals/RESULTS.md).
 
-**Stack:** Python 3.10+, LangGraph, Groq (`llama-3.3-70b-versatile`, temperature 0), Open-Meteo, Pydantic v2, PyYAML, FastAPI and pytest.
+**Stack:** Python 3.10+, LangGraph, Groq (`openai/gpt-oss-120b`, temperature 0; override with `GROQ_MODEL`), Open-Meteo, Pydantic v2, PyYAML, FastAPI and pytest.
 
 ## Architecture
 
