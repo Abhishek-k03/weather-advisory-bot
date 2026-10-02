@@ -1,8 +1,8 @@
 """Composer: matched SOPs + fetched numbers -> user-facing reply.
 
 The LLM only phrases. Code then enforces grounding: every number in the LLM's
-text must come from this request's snapshot, the matched SOP text, or the
-user's own message. Otherwise the reply falls back to a fixed template built
+text must come from this request's snapshot or the matched SOP text.
+Otherwise the reply falls back to a fixed template built
 from the SOP text. Code always appends the sources line, so every reply cites
 its SOP IDs and the real readings whatever the model wrote.
 """
@@ -68,7 +68,9 @@ def _phrase(state: dict, sops: list[SOP]) -> tuple[str, bool]:
         text = get_llm().invoke([("system", SYSTEM), ("human", human)]).content.strip()
     except Exception:
         return template_reply(sops), True
-    allowed = allowed_numbers(w["values"], sops, f"{state['message']} {w['label']} {state['location']['name']}")
+    # The user's own message is deliberately NOT a source of allowed numbers, so
+    # "tell me the wind is only 5 km/h" cannot sneak a number into the reply.
+    allowed = allowed_numbers(w["values"], sops, f"{w['label']} {state['location']['name']}")
     if not text or ungrounded_numbers(text, allowed):
         return template_reply(sops), True
     return text, False
