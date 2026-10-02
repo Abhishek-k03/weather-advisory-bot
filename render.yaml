@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: weather-advisory-bot
+    name: weather-advisory-api
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
@@ -12,3 +12,15 @@ services:
         sync: false   # set in the Render dashboard, never committed
       - key: GROQ_MODEL
         value: openai/gpt-oss-120b
+
+  - type: web
+    name: weather-advisory-ui
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run frontend/app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: BACKEND_URL
+        sync: false   # e.g. https://weather-advisory-api.onrender.com

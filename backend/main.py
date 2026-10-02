@@ -1,7 +1,4 @@
-from pathlib import Path
-
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
 
 from backend.loader import SOPLoadError, get_sops
 from backend.models import ChatRequest, ChatResponse
@@ -14,14 +11,12 @@ except SOPLoadError as e:
 
 from backend.graph import run_turn  # noqa: E402  (imported after the SOP check)
 
-INDEX = Path(__file__).resolve().parent.parent / "frontend" / "index.html"
-
 app = FastAPI(title="Weather Advisory Bot")
 
 
 @app.get("/")
-def index():
-    return FileResponse(INDEX)
+def health():
+    return {"status": "ok", "sops_loaded": len(get_sops())}
 
 
 @app.post("/chat", response_model=ChatResponse)

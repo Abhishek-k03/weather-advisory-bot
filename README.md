@@ -12,13 +12,14 @@ python -m venv .venv
 .venv\Scripts\activate              # Windows  (macOS/Linux: source .venv/bin/activate)
 pip install -r requirements.txt
 cp .env.example .env                # then put your GROQ_API_KEY in .env
-uvicorn backend.main:app --reload
+uvicorn backend.main:app --reload                 # backend API on :8000
+streamlit run frontend/app.py                     # chat UI on :8501 (second terminal)
 ```
 
-Then open http://localhost:8000. One FastAPI process serves two things:
+Then open http://localhost:8501.
 
-- **Frontend:** a minimal React chat page (`frontend/index.html`, with React loaded from a CDN, so there is no build step).
-- **Backend:** `POST /chat`.
+- **Backend:** FastAPI, `POST /chat` (and `GET /` as a health check).
+- **Frontend:** a minimal Streamlit chat page (`frontend/app.py`). It only calls `POST /chat`. Set `BACKEND_URL` if the backend isn't on `http://127.0.0.1:8000`.
 
 ```bash
 curl -X POST localhost:8000/chat -H "Content-Type: application/json" \
@@ -35,7 +36,7 @@ The response holds:
 
 **Evals:** run `pytest -v -rA` (needs `GROQ_API_KEY` and internet access). Results are in [evals/RESULTS.md](evals/RESULTS.md).
 
-**Stack:** Python 3.10+, LangGraph, Groq (`openai/gpt-oss-120b`, temperature 0; override with `GROQ_MODEL`), Open-Meteo, Pydantic v2, PyYAML, FastAPI and pytest.
+**Stack:** Python 3.10+, LangGraph, Groq (`openai/gpt-oss-120b`, temperature 0; override with `GROQ_MODEL`), Open-Meteo, Pydantic v2, PyYAML, FastAPI, Streamlit and pytest.
 
 ## Architecture
 
@@ -61,7 +62,7 @@ graph TD
 
 ```
 backend/
-  main.py        FastAPI: GET / (chat page), POST /chat; refuses to start on a bad SOP file
+  main.py        FastAPI: POST /chat, GET / health; refuses to start on a bad SOP file
   graph.py       LangGraph nodes + conditional edges; locate / fetch_weather / override / no_match / failure
   nodes/intake.py    message -> Intent (LLM, Pydantic-validated)
   nodes/matcher.py   intent + live numbers -> ranked SOP IDs
@@ -71,7 +72,7 @@ backend/
   models.py      SOP / Intent / API / graph-state schemas
   memory.py      per-session history + established facts
   sops/          POLICY LIVES HERE - data only
-frontend/index.html   React chat UI
+frontend/app.py       Streamlit chat UI
 evals/                eval suite, recorded payload, results
 ```
 
@@ -234,9 +235,9 @@ Case 5b replays a real payload recorded with `python -m evals.record_payload`, s
 ## Deploy (Render)
 
 1. Push the repo to GitHub.
-2. On Render choose **New → Blueprint** and pick the repo. [render.yaml](render.yaml) defines one free web service.
-3. Set `GROQ_API_KEY` in the dashboard. It is never committed, and `.env` is git-ignored.
-4. The service runs `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`.
+2. On Render choose **New → Blueprint** and pick the repo. [render.yaml](render.yaml) defines two free web services: the API and the Streamlit UI.
+3. Set `GROQ_API_KEY` on the API service in the dashboard. It is never committed, and `.env` is git-ignored.
+4. Set `BACKEND_URL` on the UI service to the API service's public URL. The UI's URL is the live link to submit.
 
 ## Demo script (for the recording)
 
