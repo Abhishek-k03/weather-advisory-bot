@@ -63,7 +63,9 @@ class Intent(BaseModel):
         "True if the user asks whether weather makes an outdoor activity, trip, outing or "
         "taking someone/a pet outside safe or advisable, or follows up on such a question. "
         "False for anything else."))
-    location: str | None = Field(None, description="City or town named in THIS message, else null.")
+    location: str | None = Field(None, description=(
+        "Just the city or town named in THIS message, else null. For a landmark or area give its "
+        "city only, e.g. 'Juhu beach in Mumbai' -> 'Mumbai'."))
     activity: str | None = Field(None, description="The outdoor activity in THIS message, e.g. 'cycling to work', else null.")
     audience: str | None = Field(None, description="Who it is for if not the user (e.g. 'child', 'elderly parent', 'dog'), else null.")
     time_window: TimeWindow | None = Field(None, description=(
