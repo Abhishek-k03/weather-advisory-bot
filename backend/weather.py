@@ -92,46 +92,48 @@ def fetch_forecast(latitude: float, longitude: float) -> dict:
 
 
 def describe(field: str, value) -> str:
+    """Readable form of one reading, e.g. "gusts 62.3 km/h"."""
     label, unit = READINGS.get(field, (field, ""))
     return f"{label} {value}{unit}"
 
 
-def _worst(values):
+def worst_value(values):
+    """The highest value in a window (ignoring missing hours), or None if all are missing."""
     present = [v for v in values if v is not None]
     return max(present) if present else None
 
 
 def build_snapshot(data: dict, time_window: str = "now") -> dict:
-    """Reduce a raw forecast to one dict of numbers for the asked-about window.
+    """Reduce a raw forecast to one set of numbers for the time window being asked about.
 
-    "now" uses the current block; other windows take the worst (max) hourly
-    value of each field, so a threshold crossed at any hour in the window counts.
+    "now" uses the current block. Any other window takes the worst (highest)
+    hourly value of each field, so a threshold crossed at any hour counts.
     """
     hourly = data["hourly"]
-    times = [datetime.fromisoformat(t) for t in hourly["time"]]
+    hour_times = [datetime.fromisoformat(t) for t in hourly["time"]]
     now = datetime.fromisoformat(data["current"]["time"])
 
     if time_window in WINDOWS:
-        day, first, last = WINDOWS[time_window]
-        date = (now + timedelta(days=day)).date()
-        idx = [i for i, t in enumerate(times) if t.date() == date and first <= t.hour <= last]
-        if not idx:
+        day_offset, first_hour, last_hour = WINDOWS[time_window]
+        day = (now + timedelta(days=day_offset)).date()
+        in_window = [i for i, t in enumerate(hour_times)
+                     if t.date() == day and first_hour <= t.hour <= last_hour]
+        if not in_window:
             raise WeatherUnavailable(f"no hourly forecast for {time_window}")
-        values = {f: _worst(hourly[f][i] for i in idx) for f in FIELDS}
-        start = times[idx[0]]
-        label = f"{time_window}, {times[idx[0]]:%H}:00-{times[idx[-1]]:%H}:59 local, worst hour"
+
+        values = {field: worst_value(hourly[field][i] for i in in_window) for field in FIELDS}
+        window_start = hour_times[in_window[0]]
+        label = f"{time_window}, {window_start:%H}:00-{hour_times[in_window[-1]]:%H}:59 local, worst hour"
     else:
-        values = {f: data["current"].get(f) for f in FIELDS}
-        start = now.replace(minute=0)
+        values = {field: data["current"].get(field) for field in FIELDS}
+        window_start = now.replace(minute=0)
         label = f"now, {now:%H:%M} local"
 
-    next_24h = [hourly["precipitation"][i] or 0 for i, t in enumerate(times)
-                if start <= t < start + timedelta(hours=24)]
-    values["precipitation_next_24h"] = round(sum(next_24h), 1)
+    # Total rain over the 24 hours starting at the window (used by the heavy-rain SOP).
+    rain_next_24h = sum(
+        hourly["precipitation"][i] or 0
+        for i, t in enumerate(hour_times)
+        if window_start <= t < window_start + timedelta(hours=24)
+    )
+    values["precipitation_next_24h"] = round(rain_next_24h, 1)
     return {"values": values, "label": label}
-
-
-def get_weather(city: str, time_window: str = "now") -> dict:
-    loc = geocode(city)
-    snapshot = build_snapshot(fetch_forecast(loc["latitude"], loc["longitude"]), time_window)
-    return {"location": loc, **snapshot}
