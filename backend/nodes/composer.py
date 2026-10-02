@@ -50,8 +50,14 @@ def template_reply(sops: list[SOP]) -> str:
 
 def sources_line(sops: list[SOP], weather: dict, location: dict, situational: bool) -> str:
     overall = "high" if situational else max((s.severity for s in sops), key=SEVERITY_RANK.get)
-    ids = ", ".join(f"{s.id} ({s.severity})" for s in sops)
-    readings = ", ".join(describe(f, v) for f, v in weather["values"].items() if v is not None)
+    values = weather["values"]
+
+    def cite(s: SOP) -> str:
+        based_on = ", ".join(describe(f, values[f]) for f in s.conditions)
+        return f"{s.id} ({s.severity}, based on {based_on})" if based_on else f"{s.id} ({s.severity})"
+
+    ids = "; ".join(cite(s) for s in sops)
+    readings = ", ".join(describe(f, v) for f, v in values.items() if v is not None)
     return (f"Overall severity: {overall}. Sources: {ids}.\n"
             f"Live data for {location['name']} ({weather['label']}, Open-Meteo): {readings}.")
 
