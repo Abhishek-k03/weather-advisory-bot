@@ -8,8 +8,8 @@
     wind_gusts_10m: { gte: 50 }   # km/h
   advice: >
     Wind gusts of 50 km/h or more are a safety risk on two wheels, not a comfort
-    issue: a side gust can push a rider into traffic. Advise against riding until
-    gusts drop below 50 km/h and suggest a car, bus or metro instead.
+    issue: a side gust can push a rider into traffic. Do not ride until gusts drop
+    below 50 km/h; use a car, bus or metro instead.
   cite_as: "SOP-EX-01 - Strong gusts, two-wheeled riding"
 
 - id: SOP-EX-02
@@ -22,9 +22,9 @@
     apparent_temperature: { gte: 38 }   # feels-like °C
   advice: >
     A feels-like temperature of 38°C or more carries a real risk of heat
-    exhaustion and heat stroke during exertion. Advise against strenuous outdoor
-    exercise in this window; move it before 8am, after sunset, or indoors. Anyone
-    who goes anyway should carry water and stop at the first sign of dizziness or nausea.
+    exhaustion and heat stroke during exertion. Avoid strenuous outdoor exercise in
+    this window; move it before 8am, after sunset, or indoors. If you go anyway,
+    carry water and stop at the first sign of dizziness or nausea.
   cite_as: "SOP-EX-02 - Extreme heat, strenuous exercise"
 
 - id: SOP-EX-03
@@ -36,8 +36,8 @@
   conditions:
     uv_index: { gte: 8 }
   advice: >
-    A UV index of 8 or higher burns unprotected skin in minutes. Recommend
-    exercising before 10am or after 4pm; if going out between 10am and 4pm, use
+    A UV index of 8 or higher burns unprotected skin in minutes. Exercise before
+    10am or after 4pm; if you go out between 10am and 4pm, use
     SPF 30+ sunscreen, a hat and sunglasses, and rest in shade.
   cite_as: "SOP-EX-03 - Very high UV, daytime exercise"
 

@@ -7,9 +7,8 @@
   conditions:
     precipitation_probability: { gte: 70 }   # %
   advice: >
-    Rain is likely (a 70% chance or more). Warn of possible delays and
-    waterlogged roads, recommend checking traffic and transport alerts before
-    leaving, and allow extra travel time.
+    Rain is likely (a 70% chance or more). Expect delays and waterlogged roads,
+    check traffic and transport alerts before leaving, and allow extra travel time.
   cite_as: "SOP-TR-01 - Rain likely, travel delays"
 
 - id: SOP-TR-02
@@ -20,8 +19,8 @@
   conditions:
     weather_code: { gte: 95 }   # WMO codes 95-99 = thunderstorm
   advice: >
-    Thunderstorms are forecast. Advise postponing non-essential travel until the
-    storm passes. If the trip cannot wait: no two-wheelers, avoid flooded
+    Thunderstorms are forecast. Postpone non-essential travel until the storm
+    passes. If the trip cannot wait: no two-wheelers, avoid flooded
     underpasses and low-lying roads, and never shelter under an isolated tree.
   cite_as: "SOP-TR-02 - Thunderstorm, travel"
 
