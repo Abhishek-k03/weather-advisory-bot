@@ -1,0 +1,20 @@
+# Fuzzy SOP: "a nice day" is a judgement, not a threshold, so there are no
+# conditions. It always passes the numeric check and the model decides only
+# whether the question is about a leisure outing.
+
+- id: SOP-LE-01
+  category: leisure
+  severity: low
+  applies_when: >
+    Whether a day or time slot is nice or suitable for a relaxed outing: picnic,
+    barbecue, a day at the beach or lake, outdoor party, sightseeing, a stroll in
+    the park, sitting outside at a cafe.
+  conditions: {}
+  advice: >
+    Whether a day is "good" for an outing is a judgement, not a threshold, so do
+    not give a yes or no verdict. Describe the conditions in plain words using the
+    live temperature, feels-like temperature, chance of rain, wind and UV
+    readings. A dry, mild, light-wind day generally suits a picnic; name whichever
+    reading is least favourable and let the user decide. If another SOP in this
+    reply has a higher severity, say that it takes priority.
+  cite_as: "SOP-LE-01 - Is it a nice day for an outing (judgement call)"

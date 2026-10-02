@@ -1,0 +1,20 @@
+# Situational SOPs outrank everything else. When one applies, every outdoor-activity
+# question is treated as high severity and the reply leads with the weather system.
+# Code adds them whenever their conditions hold; the model cannot talk them away.
+
+- id: SOP-SIT-01
+  category: situational
+  severity: high
+  situational: true
+  applies_when: >
+    Any question about going outdoors, travelling, exercising, or taking
+    children, elderly people or pets outside at this location.
+  conditions:
+    precipitation_next_24h: { gte: 30 }   # mm forecast over the next 24 hours
+    pressure_msl: { lt: 1005 }            # hPa, low-pressure signature
+  advice: >
+    A low-pressure system is bringing heavy rain to this location. Treat every
+    outdoor activity as high risk until it passes: expect waterlogged roads,
+    poor visibility and slippery surfaces, postpone non-essential trips and
+    outdoor exercise, and check local weather-department alerts before going out.
+  cite_as: "SOP-SIT-01 - Active heavy-rain system (situational override)"

@@ -1,0 +1,29 @@
+- id: SOP-VG-01
+  category: vulnerable_groups
+  severity: high
+  applies_when: >
+    Taking a child, baby, toddler, elderly person, or someone with a heart or
+    breathing condition outdoors: park, playground, walk, school run, market.
+  conditions:
+    apparent_temperature: { gte: 32 }   # feels-like °C
+  advice: >
+    Children and older adults overheat faster than healthy adults. At a
+    feels-like temperature of 32°C or more, keep outdoor time under 30 minutes,
+    stay in shade, offer water every 15 minutes, and avoid 12pm-4pm entirely.
+    Go indoors at once if you notice flushed skin, unusual tiredness or confusion.
+  cite_as: "SOP-VG-01 - Heat, children and elderly"
+
+- id: SOP-VG-02
+  category: vulnerable_groups
+  severity: medium
+  applies_when: >
+    Walking or exercising a dog, cat or other pet outside, or leaving a pet
+    outdoors or in a vehicle.
+  conditions:
+    temperature_2m: { gte: 30 }   # °C
+  advice: >
+    At 30°C or above, pavement and asphalt can burn paws. Walk pets before 8am
+    or after sunset, test the ground with the back of your hand for 7 seconds
+    (too hot for you means too hot for them), carry water, and never leave a pet
+    in a parked car.
+  cite_as: "SOP-VG-02 - Heat, pets"

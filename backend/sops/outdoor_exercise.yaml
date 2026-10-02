@@ -1,0 +1,75 @@
+- id: SOP-EX-01
+  category: outdoor_exercise
+  severity: high
+  applies_when: >
+    Riding anything on two wheels: bicycle, cycling, scooter, motorbike, moped
+    or any two-wheeler, whether for exercise or commuting.
+  conditions:
+    wind_gusts_10m: { gte: 50 }   # km/h
+  advice: >
+    Wind gusts of 50 km/h or more are a safety risk on two wheels, not a comfort
+    issue: a side gust can push a rider into traffic. Advise against riding until
+    gusts drop below 50 km/h and suggest a car, bus or metro instead.
+  cite_as: "SOP-EX-01 - Strong gusts, two-wheeled riding"
+
+- id: SOP-EX-02
+  category: outdoor_exercise
+  severity: high
+  applies_when: >
+    Strenuous physical activity outdoors: running, jogging, cycling, hiking,
+    trekking, outdoor sports or workouts.
+  conditions:
+    apparent_temperature: { gte: 38 }   # feels-like °C
+  advice: >
+    A feels-like temperature of 38°C or more carries a real risk of heat
+    exhaustion and heat stroke during exertion. Advise against strenuous outdoor
+    exercise in this window; move it before 8am, after sunset, or indoors. Anyone
+    who goes anyway should carry water and stop at the first sign of dizziness or nausea.
+  cite_as: "SOP-EX-02 - Extreme heat, strenuous exercise"
+
+- id: SOP-EX-03
+  category: outdoor_exercise
+  severity: medium
+  applies_when: >
+    Outdoor exercise or sport in daylight: running, cycling, walking, hiking,
+    playing sports, outdoor swimming.
+  conditions:
+    uv_index: { gte: 8 }
+  advice: >
+    A UV index of 8 or higher burns unprotected skin in minutes. Recommend
+    exercising before 10am or after 4pm; if going out between 10am and 4pm, use
+    SPF 30+ sunscreen, a hat and sunglasses, and rest in shade.
+  cite_as: "SOP-EX-03 - Very high UV, daytime exercise"
+
+- id: SOP-EX-04
+  category: outdoor_exercise
+  severity: low
+  applies_when: >
+    Any outdoor exercise or two-wheeler riding: running, cycling, walking,
+    hiking, sports, riding a scooter or bike to work.
+  # All-clear: every threshold sits below the warning SOPs, so it never contradicts one.
+  conditions:
+    apparent_temperature: { lt: 32 }
+    uv_index: { lt: 8 }
+    wind_gusts_10m: { lt: 50 }
+    precipitation_probability: { lt: 30 }
+    precipitation_next_24h: { lt: 30 }
+    weather_code: { lt: 95 }
+  advice: >
+    None of our weather thresholds for outdoor exercise are exceeded in this
+    window. Normal precautions apply: carry water, wear reflective gear in low
+    light, and recheck if your plans move to a different time.
+  cite_as: "SOP-EX-04 - Within normal limits for outdoor exercise"
+
+- id: SOP-EX-05
+  category: outdoor_exercise
+  severity: medium
+  applies_when: >
+    Outdoor exercise of any intensity: running, cycling, walking, hiking, sports.
+  conditions:
+    apparent_temperature: { gte: 32, lt: 38 }   # feels-like °C
+  advice: >
+    A feels-like temperature between 32°C and 38°C raises the risk of dehydration
+    during exercise. Keep sessions shorter and lighter, drink water every 15-20
+    minutes, and prefer early morning or evening.
+  cite_as: "SOP-EX-05 - Hot conditions, outdoor exercise"
