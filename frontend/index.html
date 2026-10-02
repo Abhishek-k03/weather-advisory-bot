@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Weather Advisory Bot</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #f4f5f7; color: #1d2330; }
+    main { max-width: 760px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
+    h1 { font-size: 1.2rem; margin: 0 0 4px; }
+    .hint { font-size: .85rem; color: #5b6475; margin: 0 0 12px; }
+    .thread { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 12px; }
+    .msg { padding: 10px 12px; border-radius: 10px; max-width: 85%; white-space: pre-wrap; line-height: 1.4; }
+    .user { align-self: flex-end; background: #2f6fed; color: #fff; }
+    .bot { align-self: flex-start; background: #fff; border: 1px solid #dde1e8; }
+    .meta { font-size: .75rem; color: #5b6475; margin-top: 6px; }
+    form { display: flex; gap: 8px; }
+    input { flex: 1; padding: 10px; border: 1px solid #c8cdd6; border-radius: 8px; font-size: 1rem; }
+    button { padding: 10px 16px; border: 0; border-radius: 8px; background: #2f6fed; color: #fff; font-size: 1rem; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: default; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+  <script>
+    const html = htm.bind(React.createElement);
+    const { useState, useRef, useEffect } = React;
+    const sessionId = crypto.randomUUID();  // new session on every page load
+
+    function App() {
+      const [messages, setMessages] = useState([]);
+      const [text, setText] = useState("");
+      const [busy, setBusy] = useState(false);
+      const end = useRef(null);
+      useEffect(() => end.current?.scrollIntoView({ behavior: "smooth" }), [messages]);
+
+      async function send(e) {
+        e.preventDefault();
+        const message = text.trim();
+        if (!message || busy) return;
+        setText("");
+        setBusy(true);
+        setMessages(m => [...m, { role: "user", text: message }]);
+        try {
+          const res = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session_id: sessionId, message }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || res.statusText);
+          setMessages(m => [...m, { role: "bot", text: data.reply, meta: `path: ${data.path} · SOPs: ${data.sop_ids.join(", ") || "none"}` }]);
+        } catch (err) {
+          setMessages(m => [...m, { role: "bot", text: `Sorry, the server returned an error: ${err.message}` }]);
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      return html`
+        <main>
+          <h1>Weather Advisory Bot</h1>
+          <p class="hint">Ask about outdoor safety, e.g. "Is it safe to cycle to work in Bhopal today?"</p>
+          <div class="thread">
+            ${messages.map((m, i) => html`
+              <div key=${i} class=${"msg " + m.role}>
+                ${m.text}
+                ${m.meta && html`<div class="meta">${m.meta}</div>`}
+              </div>`)}
+            ${busy && html`<div class="msg bot">Checking live weather and SOPs…</div>`}
+            <div ref=${end}></div>
+          </div>
+          <form onSubmit=${send}>
+            <input value=${text} onInput=${e => setText(e.target.value)} placeholder="Type a question…" autofocus />
+            <button disabled=${busy}>Send</button>
+          </form>
+        </main>`;
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(html`<${App} />`);
+  </script>
+</body>
+</html>
