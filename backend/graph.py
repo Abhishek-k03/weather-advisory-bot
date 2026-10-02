@@ -1,9 +1,12 @@
-"""LangGraph wiring: nodes, edges and branching.
+"""LangGraph wiring: the nodes, the edges and the branching between them.
 
-intake -> locate -> fetch_weather -> match -> override/compose | no_match | failure
+    intake -> locate -> fetch_weather -> match -> compose      (with override first for a situational SOP)
+                                                match -> no_match   (when no SOP applies)
+    any step can also branch to failure
 
 failure and no_match return fixed text with no LLM call, so neither can drift
-into a plausible-sounding guess. No SOP ID or threshold appears in this file.
+into a plausible-sounding guess. No SOP ID or threshold appears in this file:
+policy lives only in backend/sops/.
 """
 from langgraph.graph import END, START, StateGraph
 
@@ -50,7 +53,7 @@ def override_node(state: GraphState) -> dict:
     lines = []
     for sop in (sops[i] for i in state["sop_ids"] if sops[i].situational):
         live = ", ".join(describe(f, values[f]) for f in sop.conditions)
-        lines.append(f"WARNING - {sop.cite_as} [high]: {' '.join(sop.advice.split())} (Live: {live}.)")
+        lines.append(f"WARNING - {sop.cite_as} [high]: {sop.advice_text} (Live: {live}.)")
     return {"lead": "\n".join(lines)}
 
 
@@ -82,8 +85,11 @@ def after_match(state: GraphState) -> str:
     return "compose" if state["sop_ids"] else "no_match"
 
 
-def ok_or_fail(next_node: str):
-    return lambda state: "failure" if state.get("error") else next_node
+def go_to_or_fail(next_node: str):
+    """Edge function: continue to next_node, or go to the failure branch if a node set an error."""
+    def route(state: GraphState) -> str:
+        return "failure" if state.get("error") else next_node
+    return route
 
 
 def build_graph():
@@ -99,8 +105,8 @@ def build_graph():
 
     g.add_edge(START, "intake")
     g.add_conditional_edges("intake", after_intake, ["failure", "no_match", "locate"])
-    g.add_conditional_edges("locate", ok_or_fail("fetch_weather"), ["failure", "fetch_weather"])
-    g.add_conditional_edges("fetch_weather", ok_or_fail("match"), ["failure", "match"])
+    g.add_conditional_edges("locate", go_to_or_fail("fetch_weather"), ["failure", "fetch_weather"])
+    g.add_conditional_edges("fetch_weather", go_to_or_fail("match"), ["failure", "match"])
     g.add_conditional_edges("match", after_match, ["failure", "override", "compose", "no_match"])
     g.add_edge("override", "compose")
     for node in ("compose", "no_match", "failure"):

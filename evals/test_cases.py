@@ -31,10 +31,14 @@ def assert_grounded(state):
     assert ungrounded_numbers(state["reply"], allowed) == []
 
 
+def words_of(text: str) -> set[str]:
+    return set(re.findall(r"[a-z]{4,}", text.lower()))
+
+
 def shared_words(question: str, sop_id: str) -> set[str]:
+    """Words (4+ letters) the question has in common with an SOP's text."""
     sop = get_sops()[sop_id]
-    words = lambda t: set(re.findall(r"[a-z]{4,}", t.lower()))  # noqa: E731
-    return words(question) & words(f"{sop.applies_when} {sop.advice} {sop.cite_as}")
+    return words_of(question) & words_of(f"{sop.applies_when} {sop.advice} {sop.cite_as}")
 
 
 # 1-2. An SOP clearly applies ---------------------------------------------------
