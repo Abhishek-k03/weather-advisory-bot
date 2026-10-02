@@ -229,6 +229,23 @@ def test_11_new_sop_goes_live_without_code_change(tmp_path, monkeypatch, fake_fo
     assert "SOP-LE-02" in s["sop_ids"] and "SOP-LE-02" in s["reply"]
 
 
+def test_13_situational_rain_system_overrides(fake_forecast, ask):
+    """Checks: the situational override. Each reading is unremarkable on its own (rain chance 65%
+    is under the 70% travel threshold, gusts 35 km/h under 50), but 60 mm of rain forecast over 24h
+    plus a 998 hPa low is an active rain system.
+    Pass: path override, SOP-SIT-01 ranked first, the reply LEADS with the rain-system warning
+    and its live numbers, overall severity high, all numbers grounded."""
+    fake_forecast(precipitation=2.5, precipitation_probability=65, pressure_msl=998.4,
+                  weather_code=63, wind_speed_10m=22.0, wind_gusts_10m=35.0)
+    s = ask("Is it safe to bike to work in Bhopal today?")
+    assert s["path"] == "override"
+    assert s["sop_ids"][0] == "SOP-SIT-01"
+    assert s["reply"].startswith("WARNING - SOP-SIT-01")
+    assert "rain next 24h 60.0 mm" in s["reply"].split("\n")[0]
+    assert "Overall severity: high" in s["reply"]
+    assert_grounded(s)
+
+
 def test_12_conflict_rule_order():
     """Checks: the conflict rule in code. Situational first, then high > medium > low, then ID.
     Pass: the exact expected order."""
