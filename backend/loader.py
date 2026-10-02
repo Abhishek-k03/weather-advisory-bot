@@ -36,9 +36,10 @@ def load_sops(sop_dir: Path = SOP_DIR) -> dict[str, SOP]:
 _cache: dict = {"key": None, "sops": None}
 
 
-def get_sops(sop_dir: Path = SOP_DIR) -> dict[str, SOP]:
+def get_sops(sop_dir: Path | None = None) -> dict[str, SOP]:
     """Cached, but reloads when any SOP file is added, removed or edited,
     so a new rule goes live on the next message without a restart."""
+    sop_dir = sop_dir or SOP_DIR
     files = sorted(Path(sop_dir).glob("*.yaml"))
     key = (str(sop_dir), tuple((f.name, f.stat().st_mtime_ns) for f in files))
     if key != _cache["key"]:
