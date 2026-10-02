@@ -55,8 +55,6 @@ The response contains:
 
 **Stack:** Python, LangGraph, Groq (`openai/gpt-oss-120b`, temperature 0, override with `GROQ_MODEL`), Open-Meteo, Pydantic v2, PyYAML, FastAPI, Streamlit, pytest.
 
-A script for the demo recording is in [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
-
 ## Project structure
 
 ```
